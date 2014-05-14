@@ -18,7 +18,7 @@ void print_usage(const char *argv[])
 #define ITERATIONS 100
 bool is_convergent(double x, double y)
 {
-    double a = -1, b = 0.0;
+    double a = -0.1, b = -0.1;
     for (int i=0; i<ITERATIONS; i++) {
         x = x*x - y*y + a;
         y = 2.0*x*y + b;
@@ -29,7 +29,7 @@ bool is_convergent(double x, double y)
     return true;
 }
 
-#define SUBDIVISIONS 100
+#define SUBDIVISIONS 10
 double get_convergence_count(double x0, double x1, double y0, double y1)
 {
     double value = 1.0;
