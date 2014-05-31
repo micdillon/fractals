@@ -15,21 +15,21 @@ void print_usage(const char *argv[])
     std::cout << "Usage: " << argv[0] << " <out_file>" << std::endl;
 }
 
-#define ITERATIONS 100
+#define ITERATIONS 200
 bool is_convergent(double x, double y)
 {
-    double a = -0.1, b = -0.1;
+    double a = -0.01, b = -0.01;
     for (int i=0; i<ITERATIONS; i++) {
         x = x*x - y*y + a;
         y = 2.0*x*y + b;
-        if (x*x + y*y > 25.0) {
+        if (x*x + y*y > 2.0) {
             return false;
         }
     }
     return true;
 }
 
-#define SUBDIVISIONS 10
+#define SUBDIVISIONS 1
 double get_convergence_count(double x0, double x1, double y0, double y1)
 {
     double value = 1.0;
@@ -45,10 +45,10 @@ double get_convergence_count(double x0, double x1, double y0, double y1)
     return value;
 }
 
-#define IMG_SIZE 1024*20
-#define SCALE 0.075
-#define X_OFFSET 6.5
-#define Y_OFFSET 6.5
+#define IMG_SIZE 1024
+#define SCALE 1.0
+#define X_OFFSET 0.0
+#define Y_OFFSET 0.0
 
 int main(int argc, const char *argv[])
 {
