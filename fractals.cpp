@@ -10,45 +10,43 @@
 
 using namespace cimg_library;
 
+struct color {
+    double r,g,b;
+    color(double _rgb) {
+        r = g = b = _rgb;
+    }
+    color(double _r, double _g, double _b) :
+        r(_r), g(_g), b(_b)
+    { }
+};
+
 void print_usage(const char *argv[])
 {
     std::cout << "Usage: " << argv[0] << " <out_file>" << std::endl;
 }
 
-#define ITERATIONS 200
-bool is_convergent(double x, double y)
-{
-    double a = -0.01, b = -0.01;
-    for (int i=0; i<ITERATIONS; i++) {
-        x = x*x - y*y + a;
-        y = 2.0*x*y + b;
-        if (x*x + y*y > 2.0) {
-            return false;
-        }
-    }
-    return true;
-}
+#define A -0.6615
+#define B 0.3788
 
-#define SUBDIVISIONS 1
-double get_convergence_count(double x0, double x1, double y0, double y1)
-{
-    double value = 1.0;
-    for (int i=0; i<SUBDIVISIONS; i++) {
-        for (int j=0; j<SUBDIVISIONS; j++) {
-            double x = ((double)i / (double)SUBDIVISIONS) * (x1 - x0) + x0;
-            double y = ((double)j / (double)SUBDIVISIONS) * (y1 - y0) + y0;
-            if (is_convergent(x,y)) {
-                value -= (1.0 / (double)(SUBDIVISIONS * SUBDIVISIONS));
-            }
-        }
-    }
-    return value;
-}
-
-#define IMG_SIZE 1024
-#define SCALE 1.0
+#define IMG_SIZE (2048*8)
+#define SCALE 4.0
 #define X_OFFSET 0.0
 #define Y_OFFSET 0.0
+
+#define ITERATIONS 200
+color get_color(double x, double y)
+{
+    for (int i=0; i<ITERATIONS; i++) {
+        if (x*x + y*y > 4.0) {
+            double grey = (double)(ITERATIONS - i) / (double)ITERATIONS;
+            return color(grey);
+        }
+        double xx = x*x - y*y + A;
+        double yy = 2.0*x*y + B;
+        x = xx; y = yy;
+    }
+    return color(0, 0, 0);
+}
 
 int main(int argc, const char *argv[])
 {
@@ -64,17 +62,17 @@ int main(int argc, const char *argv[])
             return 0;
     }
 
-    CImg<double> img(IMG_SIZE,IMG_SIZE,1,3,0);
+    CImg<double> img(IMG_SIZE, IMG_SIZE, 1, 3, 0);
 
-    for (int i=0; i<IMG_SIZE-1; i++) {
-        for (int j=0; j<IMG_SIZE-1; j++) {
-            double x0 = ((double)i / (double)IMG_SIZE) * SCALE - X_OFFSET;
-            double x1 = ((double)(i+1) / (double)IMG_SIZE) * SCALE - X_OFFSET;
-            double y0 = ((double)j / (double)IMG_SIZE) * SCALE - Y_OFFSET;
-            double y1 = ((double)(j+1) / (double)IMG_SIZE) * SCALE - Y_OFFSET;
-            double val = get_convergence_count(x0,x1,y0,y1);
-
-            img(i,j,0) = img(i,j,1) = img(i,j,2) = val * 255.0;
+    for (int i=0; i<IMG_SIZE; i++) {
+        double x0 = ((double)i / (IMG_SIZE-1)) * SCALE - SCALE * 0.5 - X_OFFSET;
+        for (int j=0; j<IMG_SIZE; j++) {
+            double y0 = ((double)j / (IMG_SIZE-1)) * SCALE - SCALE * 0.5
+                    - Y_OFFSET;
+            color c = get_color(-x0, -y0);
+            img(i,j,0) = c.r * 2000.0;
+            img(i,j,1) = c.g * 2000.0;
+            img(i,j,2) = c.b * 2000.0;
         }
         std::cout << "." << std::flush;
     }
